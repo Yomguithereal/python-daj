@@ -37,6 +37,13 @@ class Reader(object):
     def readYaml(self, filename):
         return yaml.load(self.read(filename))
 
+    def readCsv(self, filename):
+        a = []
+        with codecs.open(filename, 'r') as f:
+            for i in csv.reader(f):
+                a.append(i)
+        return a
+
 
 class Writer(object):
     ''' The Writer class aims at writing popular data file formats. '''

@@ -30,3 +30,9 @@ class ReaderTest(unittest.TestCase):
             {u'hello': u'world', u'colors': [u'yellow', u'blue']},
             daj < self.res('hello.yml')
         )
+
+    def test_csv(self):
+        self.assertEqual(
+            [['Joe', 'Dagger'], ['Elena', 'Ashcroft']],
+            daj < self.res('names.csv')
+        )

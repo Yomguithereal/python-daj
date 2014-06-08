@@ -1,1 +1,1 @@
-from daj import daj
+from .daj import daj
