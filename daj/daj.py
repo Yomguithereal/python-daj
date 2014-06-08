@@ -101,7 +101,7 @@ class Writer(object):
         self.writePlain(filename, yaml.safe_dump(self.data, indent=indent, default_flow_style=False))
 
     def writeCsv(self, filename, delimiter=','):
-        headers = isinstance(self.data[0], dict) and self.data[0].keys()
+        headers = isinstance(self.data[0], dict) and list(self.data[0].keys())
 
         with codecs.open(filename, 'w', encoding='utf-8') as f:
             w = csv.writer(f, delimiter=delimiter)
