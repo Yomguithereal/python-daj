@@ -37,12 +37,12 @@ class Reader(object):
     def readYaml(self, filename):
         return yaml.load(self.read(filename))
 
-    def readCsv(self, filename):
-        a = []
+    def readCsv(self, filename, delimiter=','):
         with codecs.open(filename, 'r') as f:
-            for i in csv.reader(f):
-                a.append(i)
-        return a
+            return [i for i in csv.reader(f, delimiter=delimiter)]
+
+    def readTsv(self, filename):
+        return self.readCsv(filename, delimiter='\t')
 
 
 class Writer(object):

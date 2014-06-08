@@ -36,3 +36,9 @@ class ReaderTest(unittest.TestCase):
             [['Joe', 'Dagger'], ['Elena', 'Ashcroft']],
             daj < self.res('names.csv')
         )
+
+    def test_tsv(self):
+        self.assertEqual(
+            [['Joe', 'Dagger'], ['Elena', 'Ashcroft']],
+            daj < self.res('names.tsv')
+        )
