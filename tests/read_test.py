@@ -10,8 +10,8 @@ from daj import daj
 
 class ReaderTest(unittest.TestCase):
 
-    def res(self, resource):
-        return 'tests/resources/%s' % resource
+    def res(self, r):
+        return 'tests/resources/%s' % r
 
     def test_plain(self):
         self.assertEqual(

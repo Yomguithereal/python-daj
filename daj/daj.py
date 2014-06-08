@@ -9,6 +9,7 @@
 #=============
 import os
 import codecs
+import sys
 import csv
 import json
 import yaml
@@ -16,9 +17,17 @@ import yaml
 
 # Helpers
 #========
+PY2 = sys.version_info[0] == 2
+
 def extension(filename):
     _, ext = os.path.splitext(filename)
     return ext
+
+def is_string(variable):
+    if PY2:
+        return isinstance(variable, basestring)
+    else:
+        return isinstance(variable, str)
 
 
 # Abstract classes
@@ -41,7 +50,7 @@ class Reader(object):
         with codecs.open(filename, 'r', encoding=encoding) as f:
             if headers:
                 reader = csv.reader(f, delimiter=delimiter)
-                h = reader.next()
+                h = next(reader)
                 a = []
                 for r in reader:
                     o = {}
@@ -58,7 +67,33 @@ class Reader(object):
 
 class Writer(object):
     ''' The Writer class aims at writing popular data file formats. '''
-    pass
+
+    defaultIndent = 2
+
+    def __init__(self, data, kind):
+        self.data = data
+        self.kind = kind
+
+    # Write hub
+    def write(self, ext, filename):
+        ext = self.kind or ext
+
+        if is_string(self.data):
+            self.writePlain(filename, self.data)
+        elif ext == '.json':
+            self.writeJson(filename)
+
+    def writePlain(self, filename, data):
+        with open(filename, 'w') as f:
+            f.write(data)
+
+    def writeJson(self, filename, indent=None):
+        self.writePlain(filename, json.dumps(self.data, indent=None))
+
+    # Retrieving the filename though greater than
+    def __gt__(self, filename):
+        ext = extension(filename)
+        self.write(ext, filename)
 
 
 # Main class
@@ -72,12 +107,6 @@ class Daj(object):
     def __init__(self, kind=None):
         self.kind = kind
 
-    # Writing
-    #--------
-
-    # Call operator as writer
-    def __call__(self, data):
-        return Writer()
 
     # Reading
     #--------
@@ -106,6 +135,18 @@ class Daj(object):
         ext = extension(filename)
         return self.read(ext, filename)
 
+
+    # Writing
+    #--------
+
+    # Call operator as writer
+    def __call__(self, data):
+        return Writer(data, self.kind)
+
+
+    # Methods
+    #--------
+
     @property
     def json(self):
         return Daj('.json')
@@ -133,7 +174,6 @@ class Daj(object):
     @property
     def tsvh(self):
         return Daj('.tsvh')
-
 
 # Exporting an instance of daj
 daj = Daj()
