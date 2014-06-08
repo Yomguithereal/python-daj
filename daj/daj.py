@@ -33,8 +33,6 @@ def is_string(variable):
 # Abstract classes
 #=================
 class Reader(object):
-    ''' The Reader class aims at reading popular data file and returning
-    parsed data. '''
 
     def read(self, filename, encoding='utf-8'):
         with codecs.open(filename, 'r', encoding=encoding) as f:
@@ -66,7 +64,6 @@ class Reader(object):
 
 
 class Writer(object):
-    ''' The Writer class aims at writing popular data file formats. '''
 
     defaultIndent = 2
 
@@ -82,13 +79,39 @@ class Writer(object):
             self.writePlain(filename, self.data)
         elif ext == '.json':
             self.writeJson(filename)
+        elif ext == '.pjson':
+            self.writeJson(filename, indent=self.defaultIndent)
+        elif ext == '.yml' or ext == '.yaml':
+            self.writeYaml(filename)
+        elif ext == '.csv' or ext == '.csvh':
+            self.writeCsv(filename)
+        elif ext == '.tsv' or ext == '.tsvh':
+            self.writeCsv(filename, delimiter='\t')
+        else:
+            self.writePlain(filename, self.data)
 
     def writePlain(self, filename, data):
-        with open(filename, 'w') as f:
+        with codecs.open(filename, 'w', encoding='utf-8') as f:
             f.write(data)
 
     def writeJson(self, filename, indent=None):
-        self.writePlain(filename, json.dumps(self.data, indent=None))
+        self.writePlain(filename, json.dumps(self.data, indent=indent))
+
+    def writeYaml(self, filename, indent=None):
+        self.writePlain(filename, yaml.safe_dump(self.data, indent=indent, default_flow_style=False))
+
+    def writeCsv(self, filename, delimiter=','):
+        headers = isinstance(self.data[0], dict) and self.data[0].keys()
+
+        with codecs.open(filename, 'w', encoding='utf-8') as f:
+            w = csv.writer(f, delimiter=delimiter)
+            if headers:
+                w.writerow(headers)
+            for r in self.data:
+                if headers:
+                    w.writerow([r[i] for i in headers])
+                else:
+                    w.writerow(r)
 
     # Retrieving the filename though greater than
     def __gt__(self, filename):
@@ -115,7 +138,7 @@ class Daj(object):
     def read(self, ext, filename):
         ext = self.kind or ext
 
-        if ext == '.json':
+        if ext == '.json' or ext == '.pjson':
             return self.reader.readJson(filename)
         elif ext == '.yml' or ext == '.yaml':
             return self.reader.readYaml(filename)
@@ -150,6 +173,10 @@ class Daj(object):
     @property
     def json(self):
         return Daj('.json')
+
+    @property
+    def pjson(self):
+        return Daj('.pjson')
 
     @property
     def yaml(self):
