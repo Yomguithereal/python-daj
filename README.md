@@ -30,6 +30,12 @@ data = daj < 'path/to/your-fracking-data.json'
 
 ## Installation
 
+With pip
+
+```python
+pip install daj
+```
+
 To install the latest dev version
 ```bash
 pip install git+https://github.com/Yomguithereal/python-daj.git
